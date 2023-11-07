@@ -1,10 +1,19 @@
 /* eslint-disable react/prop-types */
-import { useEffect } from "react";
+
+import { useLocation } from "react-router-dom";
 
 export const RockList = ({ rocks, fetchRocks }) => {
-  useEffect(() => {
-    fetchRocks;
-  }, [fetchRocks]);
+  const location = useLocation();
+  const deleteRock = (rockId) => {
+    return fetch(`http://localhost:8000/rocks/${rockId}`, {
+      method: "DELETE",
+      headers: {
+        Authorization: `Token ${
+          JSON.parse(localStorage.getItem("rock_token")).token
+        }`,
+      },
+    });
+  };
 
   const displayRocks = () => {
     if (rocks && rocks.length) {
@@ -17,6 +26,18 @@ export const RockList = ({ rocks, fetchRocks }) => {
           <p>
             In the collection of {rock.user?.first_name} {rock.user?.last_name}
           </p>
+          {location.pathname === "/allrocks" ? (
+            ""
+          ) : (
+            <button
+              className="border border-solid bg-indigo-500"
+              onClick={() => {
+                deleteRock(rock.id).then(fetchRocks);
+              }}
+            >
+              Delete
+            </button>
+          )}
         </div>
       ));
     }
